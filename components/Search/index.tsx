@@ -1,20 +1,29 @@
-import { useState } from 'react';
+import { FC, useState } from 'react';
 import { AsyncPaginate, LoadOptions } from 'react-select-async-paginate';
-const Search = () => {
-  const [search, setSearch] = useState<string | null>(null);
 
-  const API_KEY = '62e45e8e7e456591d5b7f93fbf9fc9c3';
+interface SearchProps {
+  fetchWeatherDetails: (lat: number, lon: number) => void;
+}
 
-  const loadOptions = async (search, loadOptions) => {
+type Option = {
+  value: string;
+  label: string;
+};
+
+const Search: FC<SearchProps> = ({ fetchWeatherDetails }) => {
+  const loadOptions = async (search: string) => {
+    const searchString = search ? search : 'london';
     try {
-      const url = `https://api.openweathermap.org/data/2.5/find?q=${search}&appid=${API_KEY}`;
-      const response = await fetch(url);
+      const API_KEY = process.env.API_KEY;
+      const API = process.env.API;
+      const url = `${API}/find?q=${searchString}&appid=${API_KEY}&units=imperial`;
 
+      const response = await fetch(url);
       const responseJSON = await response.json();
 
-      const list = responseJSON.list ?? [];
+      const list: Destination[] = responseJSON.list ?? [];
 
-      const options = list.map((item) => {
+      const options: Option[] = list.map((item) => {
         return {
           value: `${item.coord.lat} ${item.coord.lon}`,
           label: `${item.name} ${item.sys.country}`
@@ -30,13 +39,18 @@ const Search = () => {
     }
   };
 
+  const handleChange = async (searchData: any) => {
+    const [lat, lon] = searchData.value.split(' ');
+    fetchWeatherDetails(lat, lon);
+  };
+
   return (
     <AsyncPaginate
       className="mt-24 text-black"
       placeholder="Search for destination"
+      value="london"
       debounceTimeout={600}
-      value={search}
-      onChange={setSearch}
+      onChange={handleChange}
       loadOptions={loadOptions}
     />
   );
