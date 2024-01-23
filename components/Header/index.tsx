@@ -44,6 +44,7 @@ const Header: FC<HeaderProps> = ({ destinations }) => {
 
   useEffect(() => {
     calculateHotestAndColdest();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [destinations]);
 
   return (

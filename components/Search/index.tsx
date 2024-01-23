@@ -1,5 +1,9 @@
 import { FC, useState } from 'react';
-import { AsyncPaginate, LoadOptions } from 'react-select-async-paginate';
+import {
+  AsyncPaginate,
+  LoadOptions,
+  AsyncPaginateProps
+} from 'react-select-async-paginate';
 
 interface SearchProps {
   fetchWeatherDetails: (lat: number, lon: number) => void;
@@ -11,7 +15,7 @@ type Option = {
 };
 
 const Search: FC<SearchProps> = ({ fetchWeatherDetails }) => {
-  const loadOptions = async (search: string) => {
+  const loadOptions = async (search: string): Promise<any> => {
     const searchString = search ? search : 'london';
     try {
       const API_KEY = process.env.API_KEY;
@@ -39,9 +43,9 @@ const Search: FC<SearchProps> = ({ fetchWeatherDetails }) => {
     }
   };
 
-  const handleChange = async (searchData: any) => {
-    const [lat, lon] = searchData.value.split(' ');
-    fetchWeatherDetails(lat, lon);
+  const handleChange = (searchData: any) => {
+    const [lat, lon] = searchData?.value.split(' ');
+    fetchWeatherDetails(Number(lat), Number(lon));
   };
 
   return (
